@@ -18,10 +18,12 @@ import dash_core_components as dcc
 import dash_html_components as html
 import dash_table
 import plotly.express as px
+from datetime import date
 
 import pandas as pd
-from Components import navbar , task
 from func import *
+from Components import navbar , task
+
 import arcgis
 from arcgis.gis import GIS
 import datetime
@@ -48,9 +50,9 @@ data_df = pd.read_csv("data.csv")
 routes_df = pd.read_csv('routes.csv')
 depots_df = pd.read_csv('depots_df.csv')
 x = "2021-03-20"
-routes_df=routes_process (routes_df, x)
+
 orders_df = orders_df_process(data_df, x)
-depots_df=depots_df_process(depots_df,routes_df )
+
 
 
 colors = {"graphBackground": "#F5F5F5", "background": "#ffffff", "text": "#000000"}
@@ -58,12 +60,12 @@ mapbox_access_token = "pk.eyJ1IjoicGxvdGx5bWFwYm94IiwiYSI6ImNrOWJqb2F4djBnMjEzbG
 
 def update_data_df(routes_df, depots_df, data_df):
 
-    
+    out_stops_df= out_stops_df_process(depots_df,routes_df, orders_df, data_df, x )
     table = html.Div(
             [
                 dash_table.DataTable(
-                    data=depots_df.to_dict("rows"),
-                    columns=[{"name": i, "id": i} for i in depots_df.columns],
+                    data=out_stops_df.to_dict("rows"),
+                    columns=[{"name": i, "id": i} for i in out_stops_df.columns],
                     page_size=12,
                     style_cell={'textAlign': 'left'},
                     style_cell_conditional=[{
@@ -155,7 +157,10 @@ app.layout = dbc.Container([
                 dbc.Col([
 
                     html.Div(id="output-optimase-upload") 
-                ], width=3),
+                ],style={ "borderColor": "#8EA9C1",
+                          "boxShadow" : "0px 2px 5px 0px",
+                          "marginLeft": "15px",
+                          "width": "600px",}),
                 dbc.Col([
                     drawFigure()
                 ], width=3),
@@ -196,7 +201,7 @@ app.layout = dbc.Container([
                 dbc.Col([
                     html.H2("data frame :", className="card-title"),
                     html.Hr(),
-                    update_data_df(routes_df, depots_df, data_df)
+                    #update_data_df(routes_df, depots_df, data_df)
                 ],style={ "borderColor": "#8EA9C1",
                           "boxShadow" : "0px 2px 5px 0px",
                           "marginRight": "15px",
@@ -218,6 +223,15 @@ app.layout = dbc.Container([
         ]), color = "#e9ecef"
     )
 ], fluid=True)
+@app.callback(
+    Output('output-container-date-picker-single', 'children'),
+    Input('date-picker', 'date'))
+def update_output(date_value):
+    string_prefix = 'You have selected: '
+    if date_value is not None:
+        date_object = date.fromisoformat(date_value)
+        date_string = date_object.strftime('%Y-%m-%d')
+        return string_prefix + date_string
 
 """@app.callback(Output('MyMAP', 'figure'), [
 Input('upload-data', 'contents'),
@@ -305,17 +319,20 @@ def parse_data(contents, filename):
 
 @app.callback(
     Output("output-data-upload", "children"),
-    [Input("upload-data", "contents"), Input("upload-data", "filename")],
+    [Input("upload-data", "contents"), Input("upload-data", "filename"),Input('date-picker', 'date')],
 )
 
 
-def update_table(contents, filename):
+def update_table(contents, filename , date_value):
     table = html.Div()
-
+    if date_value is not None:
+        date_object = date.fromisoformat(date_value)
+        date_string = date_object.strftime('%Y-%m-%d')
     if contents:
         contents = contents[0]
         filename = filename[0]
         df = parse_data(contents, filename)
+        df = df.loc[df["Date"]  == date_string]
         df["Duration"]= cal_pred (df)
         df["depart_time"]= cal_depart_time(df)
         df['Arrive_time'] = cal_Arrive_time (df)
@@ -341,17 +358,23 @@ def update_table(contents, filename):
     return table
 @app.callback(
     Output("output-route-upload", "children"),
-    [Input("upload-routes", "contents"), Input("upload-routes", "filename")],
+    [Input("upload-routes", "contents"), Input("upload-routes", "filename"),
+     Input('date-picker', 'date')],
 )
 
 
-def update_routes(contents, filename):
+def update_routes(contents, filename, date_value):
+
     table1 = html.Div()
+    if date_value is not None:
+        date_object = date.fromisoformat(date_value)
+        date_string = date_object.strftime('%Y-%m-%d')
 
     if contents:
         contents = contents[0]
         filename = filename[0]
         df = parse_data(contents, filename)
+        df = df.loc[df["Date"]  == date_string]
 
         table1 = html.Div(
             [
@@ -383,9 +406,10 @@ def update_routes(contents, filename):
 
 
 
-def update_depots(contents, filename):
+def update_depots(contents, filename, ):
     table1 = html.Div()
-
+    
+        
     if contents:
         contents = contents[0]
         filename = filename[0]

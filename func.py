@@ -85,7 +85,35 @@ def orders_df_process(data, x):
     return orders_df
 def depots_df_process(depots_df,routes_df ):
     depots_df=depots_df.loc[depots_df.sourceHubName.isin(routes_df['EndDepotName'])]
-    #depots_sdf = pd.DataFrame.spatial.from_xy(depots_df, "Longitude", "Latitude")
-    #depots_sdf = depots_sdf.drop(axis=1, labels=["Longitude", "Latitude"])
-    #depots_sdf=depots_sdf.rename(columns={'sourceHubName':'Name'})
+
     return depots_df
+def out_stops_df_process(depots_df,routes_df, orders_df, data, x ): 
+    routes_df = routes_process (routes_df, x)
+    #
+    routes_fset = arcgis.features.FeatureSet.from_dataframe(routes_df)
+    #
+    orders_df=orders_df_process(data, x)
+    #
+    orders_sdf = pd.DataFrame.spatial.from_xy(orders_df, "Longitude", "Latitude")
+    orders_sdf = orders_sdf.drop(axis=1, labels=["Longitude", "Latitude"])
+    orders_fset = orders_sdf.spatial.to_featureset()
+    #
+    depots_df = depots_df_process(depots_df,routes_df )
+    depots_sdf = pd.DataFrame.spatial.from_xy(depots_df, "Longitude", "Latitude")
+    depots_sdf = depots_sdf.drop(axis=1, labels=["Longitude", "Latitude"])
+    depots_sdf=depots_sdf.rename(columns={'sourceHubName':'Name'})
+    depots_fset = depots_sdf.spatial.to_featureset()
+    today = datetime.datetime.now()
+    from arcgis.network.analysis import solve_vehicle_routing_problem
+    results = solve_vehicle_routing_problem(orders= orders_fset,
+                                            depots = depots_fset,
+                                            routes = routes_fset, 
+                                            save_route_data='true',
+                                            populate_directions='true',
+                                            travel_mode="Driving Time",
+                                            default_date=today)
+    out_stops_df = results.out_stops.sdf
+    out_stops_df = out_stops_df[['Name','RouteName','Sequence','ArriveTime','DepartTime']].sort_values(by=['RouteName','Sequence'])
+    return (out_stops_df)
+    out_stops_df = out_stops_df_process(depots_df,routes_df, orders_df, data, x )
+    print(out_stops_df)
