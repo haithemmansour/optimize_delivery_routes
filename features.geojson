@@ -1,0 +1,187 @@
+{
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "sourceHubName": "NATURALIA SEMPRUN PM"
+      },
+      "geometry": {
+        "coordinates": [
+          2.392677,
+          48.888657
+        ],
+        "type": "Point"
+      },
+      "id": "1d49e76a674f6c0b17b0191f4178edef"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "sourceHubName": "RUNGIS APRES MIDI"
+      },
+      "geometry": {
+        "coordinates": [
+          2.3527,
+          48.7461
+        ],
+        "type": "Point"
+      },
+      "id": "1d5fc453f7afe23bd4a2228a5e9c806e"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "sourceHubName": "RUNGIS MISE A DISPO FRICHTI1"
+      },
+      "geometry": {
+        "coordinates": [
+          2.362877,
+          48.751824
+        ],
+        "type": "Point"
+      },
+      "id": "2b91b26fd592721234fa7b457282ae95"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "sourceHubName": "BERCY APRES-MIDI"
+      },
+      "geometry": {
+        "coordinates": [
+          2.390183,
+          48.833122
+        ],
+        "type": "Point"
+      },
+      "id": "5378a8eb0795ae4a6f31d2845b0bc108"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "sourceHubName": "RUNGIS MATIN"
+      },
+      "geometry": {
+        "coordinates": [
+          2.39645,
+          48.89095
+        ],
+        "type": "Point"
+      },
+      "id": "55f51f3a4fa3d30e17a2b276bf8604ee"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "sourceHubName": "ST MAD FRICHTI"
+      },
+      "geometry": {
+        "coordinates": [
+          2.3527,
+          48.7461
+        ],
+        "type": "Point"
+      },
+      "id": "8a3c9ff2bab8b9c665127f5a341d7862"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "sourceHubName": "ST AM"
+      },
+      "geometry": {
+        "coordinates": [
+          2.3527,
+          48.7461
+        ],
+        "type": "Point"
+      },
+      "id": "8df698a56db41011255fc7462545a74c"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "sourceHubName": "ANNECY"
+      },
+      "geometry": {
+        "coordinates": [
+          6.106544,
+          45.909005
+        ],
+        "type": "Point"
+      },
+      "id": "9b2e4225ca1f00852bdd744745a84690"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "sourceHubName": "BERCY MATIN"
+      },
+      "geometry": {
+        "coordinates": [
+          2.390183,
+          48.833122
+        ],
+        "type": "Point"
+      },
+      "id": "b18f79d19762e18eaf7b0d8d292e3796"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "sourceHubName": "ST B2B FIXE"
+      },
+      "geometry": {
+        "coordinates": [
+          2.3527,
+          48.7461
+        ],
+        "type": "Point"
+      },
+      "id": "cf9d4b157fbcae3e440002704f55dd49"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "sourceHubName": "GRENOBLE"
+      },
+      "geometry": {
+        "coordinates": [
+          5.66619,
+          45.2331
+        ],
+        "type": "Point"
+      },
+      "id": "f205da9a8b3ac07fb230a5fcbee0c827"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "sourceHubName": "ST PM"
+      },
+      "geometry": {
+        "coordinates": [
+          2.3527,
+          48.7461
+        ],
+        "type": "Point"
+      },
+      "id": "f3915f02dfd5bb091d252b157cd28e23"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "sourceHubName": "B2B FIXE"
+      },
+      "geometry": {
+        "coordinates": [
+          2.362004,
+          48.752783
+        ],
+        "type": "Point"
+      },
+      "id": "fba82f9622a1663ef840637693cbe669"
+    }
+  ],
+  "type": "FeatureCollection"
+}

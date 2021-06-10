@@ -5,13 +5,11 @@ body{
     margin: 0;
     padding: 0;
 };
-h1, h3, h4, h5 {
-    font-family: "Open Sans";
-    font-weight: bold;
-    letter-spacing: 2.1px;
-    font-size: 21px;
-    padding-left: 100px;
-    color : red
+.layout_title{
+  font-family: 'Trocchi';
+  line-height : 48px;
+  font-weight: normal;
+  font-size: 45px
   };
 button {
   width : 100px;
@@ -22,4 +20,11 @@ button {
     height: 35px;
     padding-bottom: 12px;
     margin-right: 8px;
-  }
+  };
+  h3, h4, h5 {
+    font-family: "Open Sans";
+    font-weight: bold;
+    letter-spacing: 2.1px;
+    font-size: 21px;
+    padding-left: 100px;
+    color : red

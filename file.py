@@ -5,14 +5,14 @@ Created on Wed Jun  2 23:50:56 2021
 @author: Haythem
 """
 
-import base64
+
 import datetime
-import io
+
 import plotly.graph_objs as go
 
-from jupyter_dash import JupyterDash
+
 import dash
-from dash.dependencies import Input, Output, State
+from dash.dependencies import Input, Output
 import dash_bootstrap_components as dbc
 import dash_core_components as dcc
 import dash_html_components as html
@@ -23,6 +23,7 @@ from datetime import date
 import pandas as pd
 from func import *
 from Components import navbar , task
+from datetime import datetime as dt
 
 import arcgis
 from arcgis.gis import GIS
@@ -33,6 +34,8 @@ from IPython.display import HTML
 from arcgis import geocoding
 from arcgis.features import Feature, FeatureSet
 from arcgis.features import GeoAccessor, GeoSeriesAccessor
+import plotly.graph_objects as go
+
 
 portal_url = 'https://www.arcgis.com'
 #connect to your GIS
@@ -55,10 +58,137 @@ orders_df = orders_df_process(data_df, x)
 
 
 
-colors = {"graphBackground": "#F5F5F5", "background": "#ffffff", "text": "#000000"}
-mapbox_access_token = "pk.eyJ1IjoicGxvdGx5bWFwYm94IiwiYSI6ImNrOWJqb2F4djBnMjEzbG50amg0dnJieG4ifQ.Zme1-Uzoi75IaFbieBDl3A"
 
-def update_data_df(routes_df, depots_df, data_df):
+colors = {"graphBackground": "#F5F5F5", "background": "#ffffff", "text": "#000000"}
+mapbox_access_token = "pk.eyJ1IjoiaGF5dGhlbS1tYW5zb3VyIiwiYSI6ImNrcHB6bTB2MzBlb3IydnM0bnRyZzl1NXAifQ.4Yms3o7MHgDjxI5AAjNT9Q"
+def update_data_df(data_df):
+
+    table = html.Div(
+            [
+                dash_table.DataTable(
+                    data=data_df.to_dict("rows"),
+                    columns=[{"name": i, "id": i} for i in data_df.columns],
+                    page_size=12,
+                    style_cell={'textAlign': 'left'},
+                    style_cell_conditional=[{
+                                                'if': {'column_id': 'Region'},
+                                                'textAlign': 'left'
+                                            }],
+                    style_table={'height': '300px','overflowY': 'auto'},
+                ),
+                html.Hr(),
+
+            ]
+        )
+    return table
+def update_routes_df(routes_df):
+
+    table = html.Div(
+            [
+                dash_table.DataTable(
+                    data=routes_df.to_dict("rows"),
+                    columns=[{"name": i, "id": i} for i in routes_df.columns],
+                    page_size=12,
+                    style_cell={'textAlign': 'left'},
+                    style_cell_conditional=[{
+                                                'if': {'column_id': 'Region'},
+                                                'textAlign': 'left'
+                                            }],
+                    style_table={'height': '300px','overflowY': 'auto'},
+                    style_as_list_view=True,
+                ),
+                html.Hr(),
+
+            ]
+        )
+    return table
+def update_depots_df(depots_df):
+
+    table = html.Div(
+            [
+                dash_table.DataTable(
+                    data=depots_df.to_dict("rows"),
+                    columns=[{"name": i, "id": i} for i in depots_df.columns],
+                    page_size=12,
+                    style_cell={'textAlign': 'left'},
+                    style_cell_conditional=[{
+                                                'if': {'column_id': 'Region'},
+                                                'textAlign': 'left'
+                                            }],
+                    style_table={'height': '300px','overflowY': 'auto'},
+                ),
+                html.Hr(),
+
+            ]
+        )
+    return table
+
+
+
+def update_depots_map(depots_df):
+
+    fig = go.Figure(go.Scattermapbox(
+        lat=pd.Series(depots_df['Longitude'], dtype="string").tolist(),
+        lon=pd.Series(depots_df['Longitude'], dtype="string").tolist(),
+        mode='markers',
+        marker=go.scattermapbox.Marker(
+            size=14
+        ),
+        text=pd.Series(depots_df['sourceHubName'], dtype="string").tolist(),
+    ))
+
+    fig.update_layout(
+        hovermode='closest',
+        mapbox=dict(
+            accesstoken=mapbox_access_token,
+            bearing=0,
+            center=go.layout.mapbox.Center(
+                lat=48.751824,
+                lon=2.362877,
+                    
+     
+            ),
+            pitch=0,
+            zoom=5
+        )
+    )
+    return fig
+def update_figure(depots_df):
+
+    locations=[go.Scattermapbox(
+                    lon = pd.Series(depots_df['Longitude'], dtype="string").tolist(),
+                    lat = pd.Series(depots_df['Latitude'], dtype="string").tolist(),
+                    mode='markers',
+                    marker=go.scattermapbox.Marker(size=14),
+                    unselected={'marker' : {'opacity':1}},
+                    selected={'marker' : {'opacity':0.5, 'size':25}},
+                    hoverinfo='text',
+                    hovertext=depots_df['sourceHubName'],
+    )]
+
+    # Return figure
+    return {
+        'data': locations,
+        'layout': go.Layout(
+            uirevision= 'foo', #preserves state of figure/map after callback activated
+            clickmode= 'event+select',
+            hovermode='closest',
+            hoverdistance=5,
+            title=dict(text="Les Postions des dépots :",font=dict(size=20, color='#7c795d')),
+            mapbox=dict(
+                accesstoken=mapbox_access_token,
+                bearing=100,
+                style='light',
+                center=dict(
+                   lat=48.751824,
+                   lon=2.362877,
+                ),
+                pitch=40,
+                zoom=15
+            ),
+        )
+    }
+"""def update_data_df(routes_df, depots_df, data_df):
 
     out_stops_df= out_stops_df_process(depots_df,routes_df, orders_df, data_df, x )
     table = html.Div(
@@ -79,7 +209,7 @@ def update_data_df(routes_df, depots_df, data_df):
             ]
         )
 
-    return table
+    return table"""
 """@app.callback(Output('Mygraph1', 'figure'), [
 Input('upload-data', 'contents'),
 Input('upload-data', 'filename') ])
@@ -154,16 +284,28 @@ app.layout = dbc.Container([
             ], align='center'), 
             html.Br(),
             dbc.Row([
-                dbc.Col([
-
-                    html.Div(id="output-optimase-upload") 
-                ],style={ "borderColor": "#8EA9C1",
-                          "boxShadow" : "0px 2px 5px 0px",
-                          "marginLeft": "15px",
-                          "width": "600px",}),
-                dbc.Col([
-                    drawFigure()
-                ], width=3),
+                    dbc.Col(
+                            [html.Div(
+                            className="div-for-dropdown",
+                            children=[
+                                dcc.DatePickerSingle(
+                                    id="date-picker",
+                                    min_date_allowed=dt(2021, 1, 1),
+                                    max_date_allowed=dt(2021, 3, 31),
+                                    initial_visible_month=dt(2021, 1, 1),
+                                    date=dt(2021, 1, 1).date(),
+                                    display_format="MMMM D, YYYY",
+                                    style={"border": "0px solid black"},
+                                ),
+                                html.Div(id='output-container-date-picker-single')
+                            ],
+                        ),],
+                                  style={
+                                           'width': '250px',
+                                           'height' : "490px",
+                                           "borderColor": "#8EA9C1",
+                                          "boxShadow" : "0px 2px 5px 0px",
+                                          "marginLeft": "15px",}, width=4),
                 dbc.Col([
                     html.Div(id="output-route-upload") 
                 ],style={ "borderColor": "#8EA9C1",
@@ -178,10 +320,38 @@ app.layout = dbc.Container([
             html.Br(),
             dbc.Row([
                 dbc.Col([
-                    html.Div(id="output-data-upload") 
+                    html.H2("tableau des tâches :", className="card-title"),
+                    html.Hr(),
+                    update_data_df(data_df)
                 ],style={ "borderColor": "#8EA9C1",
                           "boxShadow" : "0px 2px 5px 0px",
-                          "marginRight": "15px",}, width=9),
+                          "marginRight": "15px",
+                          "padding": "1%"}, width=8),
+                dbc.Col([
+                     
+                
+                ],style={ "borderColor": "#8EA9C1",
+                          "boxShadow" : "0px 2px 5px 0px",
+                          "marginLeft": "15px",
+                          "width": "360px",
+                          "height": "490px",
+                          'padding':"2%"}),
+            ],style={ "borderColor": "#8EA9C1",
+                          "boxShadow" : "0px 2px 5px 0px",
+                          "marginLeft": "1.px",
+                          "marginRight": "1px",
+                          "padding" : "10px",
+                          }),
+            html.Br(),
+            dbc.Row([
+                dbc.Col([
+                    html.H2("tableau des Tournées :", className="card-title"),
+                    html.Hr(),
+                    update_routes_df(routes_df)
+                ],style={ "borderColor": "#8EA9C1",
+                          "boxShadow" : "0px 2px 5px 0px",
+                          "marginRight": "15px",
+                          "padding": "1%"}, width=8),
                 dbc.Col([
                     dbc.Col([task],style={
                                         "borderColor": "#8EA9C1",
@@ -195,7 +365,33 @@ app.layout = dbc.Container([
                           "boxShadow" : "0px 2px 5px 0px",
                           "marginLeft": "1.px",
                           "marginRight": "1px",
-                          "padding" : "10px",}),
+                          "padding" : "10px",
+                          }),
+            html.Br(),
+            dbc.Row([
+                dbc.Col([
+                    html.H2("tableau des dépôts:", className="card-title"),
+                    html.Hr(),
+                    update_depots_df(depots_df)
+                ],style={ "borderColor": "#8EA9C1",
+                          "boxShadow" : "0px 2px 5px 0px",
+                          "marginRight": "15px",
+                          "padding": "1%"}, width=8),
+                dbc.Col([
+                    dbc.Col([task],style={
+                                        "borderColor": "#8EA9C1",
+                                       "boxShadow" : "0px 2px 5px 0px",})
+                ],style={ "borderColor": "#8EA9C1",
+                          "boxShadow" : "0px 2px 5px 0px",
+                          "marginLeft": "15px",
+                          "width": "360px",
+                          "height": "490px"}),
+            ],style={ "borderColor": "#8EA9C1",
+                          "boxShadow" : "0px 2px 5px 0px",
+                          "marginLeft": "1.px",
+                          "marginRight": "1px",
+                          "padding" : "10px",
+                          }),
             html.Br(),
              dbc.Row([
                 dbc.Col([
@@ -205,11 +401,10 @@ app.layout = dbc.Container([
                 ],style={ "borderColor": "#8EA9C1",
                           "boxShadow" : "0px 2px 5px 0px",
                           "marginRight": "15px",
-                          "padding" : "10px"}, width=9),
+                          "padding": "1%"}, width=8),
                 dbc.Col([
-                    dbc.Col([task],style={
-                                        "borderColor": "#8EA9C1",
-                                       "boxShadow" : "0px 2px 5px 0px",})
+                    dcc.Graph(figure=update_figure(depots_df),
+                              style={'background':'#8EA9C1'})
                 ],style={ "borderColor": "#8EA9C1",
                           "boxShadow" : "0px 2px 5px 0px",
                           "marginLeft": "15px",
@@ -219,10 +414,11 @@ app.layout = dbc.Container([
                           "boxShadow" : "0px 2px 5px 0px",
                           "marginLeft": "1.px",
                           "marginRight": "1px",
-                          "padding" : "10px",}),
-        ]), color = "#e9ecef"
+                          "padding" : "10px",
+                          "color" : "#004172"}),
+        ]), color = "#D6E4EA"
     )
-], fluid=True)
+],  fluid=True )
 @app.callback(
     Output('output-container-date-picker-single', 'children'),
     Input('date-picker', 'date'))
@@ -232,6 +428,9 @@ def update_output(date_value):
         date_object = date.fromisoformat(date_value)
         date_string = date_object.strftime('%Y-%m-%d')
         return string_prefix + date_string
+    
+
+
 
 """@app.callback(Output('MyMAP', 'figure'), [
 Input('upload-data', 'contents'),
@@ -295,7 +494,7 @@ def update_graph(contents, filename):
         ))
     return fig
 """
-
+"""
 def parse_data(contents, filename):
     content_type, content_string = contents.split(",")
 
@@ -434,7 +633,7 @@ def update_depots(contents, filename, ):
             ] 
         )
 
-    return table1
+    return table1"""
 
 if __name__ == "__main__":
     app.run_server(port=7000,debug=True)
